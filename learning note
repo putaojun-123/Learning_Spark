@@ -1,0 +1,28 @@
+# read file 
+# open file
+file_path = "./"
+emailframe = pd.read_excel(os.path.join(file_path, "chinesespam.xlsx"), 0) # pandas 文档
+
+## excel / csv(逗号分隔的表格文件) / 任意的文本文件（其自身的分隔符\t \1） 
+
+print("data shape:", emailframe.shape)
+print("spams in rows:", emailframe.loc[emailframe['type'] == "spam"].shape[0])
+print("ham in rows:", emailframe.loc[emailframe['type'] == "ham"].shape[0])
+
+#load stopwords
+stopwords = codecs.open(os.path.join(file_path, 'stopwords.txt'), 'r', 'UTF8').read().split('\r\n')
+
+#cut words and process text
+processed_texts = []
+for text in emailframe["text"]:
+    words = []
+    seg_list = jieba.cut(text) # jieba.cut
+    for seg in seg_list:
+        if (seg.isalpha()) & (seg not in stopwords):
+            words.append(seg)
+    sentence = " ".join(words)
+    processed_texts.append(sentence)
+emailframe["text"] = processed_texts
+
+#inspect processed text
+emailframe.head(3)
